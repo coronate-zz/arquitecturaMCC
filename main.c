@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "cache.h"
+#include "cache.h" /
 #include "main.h"
 
 static FILE *traceFile;
