@@ -40,28 +40,28 @@ void set_cache_param(param, value)
     cache_block_size = value;
     words_per_block = value / WORD_SIZE;
     break;
-  case CACHE_PARAM_USIZE:
+  case CACHE_PARAM_USIZE: //Unified 
     cache_split = FALSE;
     cache_usize = value;
     break;
-  case CACHE_PARAM_ISIZE:
+  case CACHE_PARAM_ISIZE: //Instruction size
     cache_split = TRUE;
     cache_isize = value;
     break;
-  case CACHE_PARAM_DSIZE:
+  case CACHE_PARAM_DSIZE: //Data Cache Size
     cache_split = TRUE;
     cache_dsize = value;
     break;
-  case CACHE_PARAM_ASSOC:
+  case CACHE_PARAM_ASSOC: //Associativity
     cache_assoc = value;
     break;
-  case CACHE_PARAM_WRITEBACK:
+  case CACHE_PARAM_WRITEBACK: 
     cache_writeback = TRUE;
     break;
   case CACHE_PARAM_WRITETHROUGH:
     cache_writeback = FALSE;
     break;
-  case CACHE_PARAM_WRITEALLOC:
+  case CACHE_PARAM_WRITEALLOC: 
     cache_writealloc = TRUE;
     break;
   case CACHE_PARAM_NOWRITEALLOC:
@@ -73,16 +73,52 @@ void set_cache_param(param, value)
   }
 
 }
+
 /************************************************************/
 
 /************************************************************/
-void init_cache()
+void init_cache() 
 {
+  cache miCache;
 
   /* initialize the cache, and cache statistics data structures */
+  miCache.size=10;
+  miCache.associativity=1;
+
+
+  miCache.n_sets=1;
+  /*Debemos configurar el numero de sets dependiendo
+  del grado de asociatividad y cache_split*/
+
+  miCache.index_mask=1;
+  /*el index es el numero de lineas y lo calculamos
+  * usando el tamaño de la linea y el tamaño del cache*/
+
+  miCache.index_mask_offset=1;
+  /* se calcula usando words_per_block*/
+
+  //miCache.LRU_head->tag;
+  //miCache.LRU_tail->tag;
+
+  //miCache.set_contents=1;
+  miCache.contents=1;
+
+
+  imprimirCache(miCache);
 
 }
 /************************************************************/
+void imprimirCache(cache miCache)
+{
+  printf("\n **imprimir Cache**\n" );
+  printf("\tTamano: %u\n",  miCache.size);
+  printf("\tGrado de Asociatividad : %u\n",  miCache.associativity);
+  printf("\tIndex Mask : %u\n",  miCache.n_sets);   
+  printf("\tOffset Mask : %u\n",  miCache.n_sets);    
+  printf("\tContents: %u\n",  miCache.n_sets);   
+
+
+}
 
 /************************************************************/
 void perform_access(addr, access_type)
@@ -106,9 +142,9 @@ void flush()
 /************************************************************/
 void delete(head, tail, item)
   Pcache_line *head, *tail;
-  Pcache_line item;
+  Pcache_line item; //Esto esta raro no es un apuntador y sin embargo se usa item->LRU_prev
 {
-  if (item->LRU_prev) {
+  if (item->LRU_prev) { 
     item->LRU_prev->LRU_next = item->LRU_next;
   } else {
     /* item at head */

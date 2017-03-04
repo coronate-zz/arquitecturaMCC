@@ -49,6 +49,8 @@ typedef struct cache_ {
   int contents;			/* number of valid entries in cache */
 } cache, *Pcache;
 
+
+
 typedef struct cache_stat_ {
   int accesses;			/* number of memory references */
   int misses;			/* number of cache misses */
@@ -67,7 +69,7 @@ void delete();
 void insert();
 void dump_settings();
 void print_stats();
-
+void imprimirCache();
 
 /* macros */
 #define LOG2(x) ((int) rint((log((double) (x))) / (log(2.0))))

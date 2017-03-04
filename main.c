@@ -19,7 +19,7 @@ int main(argc, argv)
   parse_args(argc, argv);
   /*Cambia los Valores predeterminados del cache y lee el archivo en trazas/cc.trace 
   * Este archivo es el tracefile que será leido por el play_tarce*/
-
+  
   init_cache(); //Funcion creada por nosotros
 
   play_trace(traceFile);
@@ -75,23 +75,27 @@ void parse_args(argc, argv) // Configure the cache using total cache size, block
   arg_index = 1;
   while (arg_index != argc - 1) {
 
-    /* set the cache simulator parameters */
+    /* Dependiendo de la manera en la que ejecutemos a.out podemos cambiar caules son los
+    * valores de nuestro cache:
+    * EJEMPLO:  ./a.out -bs 500 -us 10 -is 30 -ds 50000  con este comando estamos creando un cache
+    * con un tamaño de bloque de 500, unified size de 10, instruction cache size de 30 y una capacidad
+    * de 50,000. Es necesario conocer las unidades que maneja cada flag  */
 
-    if (!strcmp(argv[arg_index], "-bs")) {  //cuando ejecutamos ./a.out -bs cambiamos el valor de BLOCK SIZE
+    if (!strcmp(argv[arg_index], "-bs")) {  //cuando ejecutamos ./a.out -bs X cambiamos el valor de BLOCK SIZE a x
       value = atoi(argv[arg_index+1]);
       set_cache_param(CACHE_PARAM_BLOCK_SIZE, value);
       arg_index += 2;
       continue;
     }
 
-    if (!strcmp(argv[arg_index], "-us")) { //cuando ejecutamos ./a.out -us cambiamos el valor de PARAM USIZE
+    if (!strcmp(argv[arg_index], "-us")) { //cuando ejecutamos ./a.out -us X cambiamos el valor de PARAM USIZE a X
       value = atoi(argv[arg_index+1]);
       set_cache_param(CACHE_PARAM_USIZE, value);
       arg_index += 2;
       continue;
     }
 
-    if (!strcmp(argv[arg_index], "-is")) { //cuando ejecutamos ./a.out -is cambiamos el valor de PARAM ISIZE
+    if (!strcmp(argv[arg_index], "-is")) { //cuando ejecutamos ./a.out -is X cambiamos el valor de PARAM ISIZE a X
       value = atoi(argv[arg_index+1]);
       set_cache_param(CACHE_PARAM_ISIZE, value);
       arg_index += 2;
