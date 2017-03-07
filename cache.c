@@ -75,10 +75,43 @@ void set_cache_param(param, value)
 }
 
 /************************************************************/
+void init_contents(Pcache_line *head, Pcache_line *tail, int *set_contents, int n_sets){
+  int i;
+  for(i = 0; i < n_sets; i++){
+    set_contents[i] = 0;
+    head[i] = (Pcache_line) NULL;
+    tail[i] = (Pcache_line) NULL;
+  } 
+}
+
+
+//Initialize unified size cache
+void init_cache_helper(cache *c, int size){
+    unsigned bits_set, bits_offset;
+    c->size = size;
+    c->associativity = 1;
+    c->n_sets = size/(cache_block_size * c->associativity);
+    bits_offset = LOG2(cache_block_size);
+    bits_set = LOG2(c->n_sets);
+    c->index_mask = (1<< (bits_set+bits_offset)) - 1;
+    c->index_mask_offset = bits_offset;
+    c->LRU_head = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
+    c->LRU_tail = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
+    c->set_contents = (int*)malloc(sizeof(int)*c->n_sets);
+    c->contents = 0;
+    init_contents(c->LRU_head, c->LRU_tail, c->set_contents,c->n_sets);
+}
+
+
+
+
 
 /************************************************************/
 void init_cache() 
 {
+
+  // unified cache 
+  init_cache_helper(&c1, cache_usize);
   cache miCache;
 
   /* initialize the cache, and cache statistics data structures */
@@ -103,8 +136,8 @@ void init_cache()
   //miCache.set_contents=1;
   miCache.contents=1;
 
-
   imprimirCache(miCache);
+  imprimirCache(c1);
 
 }
 /************************************************************/
@@ -113,9 +146,9 @@ void imprimirCache(cache miCache)
   printf("\n **imprimir Cache**\n" );
   printf("\tTamano: %u\n",  miCache.size);
   printf("\tGrado de Asociatividad : %u\n",  miCache.associativity);
-  printf("\tIndex Mask : %u\n",  miCache.n_sets);   
-  printf("\tOffset Mask : %u\n",  miCache.n_sets);    
-  printf("\tContents: %u\n",  miCache.n_sets);   
+  printf("\tIndex Mask : %u\n",  miCache.index_mask);   
+  printf("\tOffset Mask : %u\n",  miCache.index_mask_offset);    
+  printf("\tContents: %u\n",  miCache.contents);   
 
 
 }
