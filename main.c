@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "cache.h" 
 #include "main.h"
+#include <string.h>
 
 static FILE *traceFile;
 
@@ -20,6 +21,7 @@ int main(argc, argv)
   /*Cambia los Valores predeterminados del cache y lee el archivo en trazas/cc.trace 
   * Este archivo es el tracefile que será leido por el play_tarce*/
   
+  printf("\nInicializando Cache...\n\n" );
   init_cache(); //Funcion creada por nosotros
 
   play_trace(traceFile);

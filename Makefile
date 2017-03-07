@@ -1,6 +1,7 @@
 default:
 	gcc	-g 	main.c 	cache.c
-	./a.out 
+	./a.out trazas/spice10.trace
+
 	#gdb a.out
 
 ex1:

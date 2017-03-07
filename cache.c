@@ -89,7 +89,7 @@ void init_contents(Pcache_line *head, Pcache_line *tail, int *set_contents, int 
 void init_cache_helper(cache *c, int size){
     unsigned bits_set, bits_offset;
     c->size = size;
-    c->associativity = 1;
+    c->associativity = cache_assoc;
     c->n_sets = size/(cache_block_size * c->associativity);
     bits_offset = LOG2(cache_block_size);
     bits_set = LOG2(c->n_sets);
@@ -110,45 +110,21 @@ void init_cache_helper(cache *c, int size){
 void init_cache() 
 {
 
-  // unified cache 
   init_cache_helper(&c1, cache_usize);
-  cache miCache;
-
-  /* initialize the cache, and cache statistics data structures */
-  miCache.size=10;
-  miCache.associativity=1;
-
-
-  miCache.n_sets=1;
-  /*Debemos configurar el numero de sets dependiendo
-  del grado de asociatividad y cache_split*/
-
-  miCache.index_mask=1;
-  /*el index es el numero de lineas y lo calculamos
-  * usando el tamaño de la linea y el tamaño del cache*/
-
-  miCache.index_mask_offset=1;
-  /* se calcula usando words_per_block*/
-
-  //miCache.LRU_head->tag;
-  //miCache.LRU_tail->tag;
-
-  //miCache.set_contents=1;
-  miCache.contents=1;
-
-  imprimirCache(miCache);
   imprimirCache(c1);
-
 }
 /************************************************************/
 void imprimirCache(cache miCache)
 {
-  printf("\n **imprimir Cache**\n" );
-  printf("\tTamano: %u\n",  miCache.size);
-  printf("\tGrado de Asociatividad : %u\n",  miCache.associativity);
+
+  printf("*** Datos en Cache ***" );
+  printf("\n\t**Size: %u\n",  miCache.size);
+  printf("\t**Associativity : %u\n",  miCache.associativity);
+  printf("\t**Num Sets : %u\n",  miCache.n_sets);
+
   printf("\tIndex Mask : %u\n",  miCache.index_mask);   
   printf("\tOffset Mask : %u\n",  miCache.index_mask_offset);    
-  printf("\tContents: %u\n",  miCache.contents);   
+  printf("\tContents: %u\n\n\n",  miCache.contents);   
 
 
 }
@@ -157,6 +133,8 @@ void imprimirCache(cache miCache)
 void perform_access(addr, access_type)
   unsigned addr, access_type;
 {
+  printf("\nRealizando acceso a  Cache\n" );
+
 
   /* handle an access to the cache */
 
@@ -240,6 +218,7 @@ void print_stats()
   printf(" INSTRUCTIONS\n");
   printf("  accesses:  %d\n", cache_stat_inst.accesses);
   printf("  misses:    %d\n", cache_stat_inst.misses);
+
   if (!cache_stat_inst.accesses)
     printf("  miss rate: 0 (0)\n"); 
   else
@@ -247,6 +226,9 @@ void print_stats()
 	 (float)cache_stat_inst.misses / (float)cache_stat_inst.accesses,
 	 1.0 - (float)cache_stat_inst.misses / (float)cache_stat_inst.accesses);
   printf("  replace:   %d\n", cache_stat_inst.replacements);
+
+
+
 
   printf(" DATA\n");
   printf("  accesses:  %d\n", cache_stat_data.accesses);
@@ -258,6 +240,9 @@ void print_stats()
 	 (float)cache_stat_data.misses / (float)cache_stat_data.accesses,
 	 1.0 - (float)cache_stat_data.misses / (float)cache_stat_data.accesses);
   printf("  replace:   %d\n", cache_stat_data.replacements);
+
+
+
 
   printf(" TRAFFIC (in words)\n");
   printf("  demand fetch:  %d\n", cache_stat_inst.demand_fetches + 
