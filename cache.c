@@ -129,11 +129,32 @@ void imprimirCache(cache miCache)
 
 }
 
+const char *byte_to_binary(int x)
+{
+    static char b[9];
+    b[0] = '\0';
+
+    int z;
+    for (z = 128; z > 0; z >>= 1)
+    {
+        strcat(b, ((x & z) == z) ? "1" : "0");
+    }
+
+    return b;
+}
+
 /************************************************************/
 void perform_access(addr, access_type)
   unsigned addr, access_type;
 {
-  printf("\nRealizando acceso a  Cache\n" );
+
+  //Imprimiendo las direcciones
+  printf("\n\n------Realizando acceso a  Cache-----" );
+  printf("\nAdress Hexadecimal:   %x  ",  addr);
+  int intAddr =(int)addr;
+  printf("\nAdress Decimal:       %d  ",  intAddr);
+  printf("\nAdress Binario:       %s\n", byte_to_binary(intAddr));
+
 
 
   /* handle an access to the cache */
