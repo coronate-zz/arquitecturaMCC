@@ -31,26 +31,24 @@ static cache_stat cache_stat_data;
 
 
 
-const char *byte_to_binary(int x)
-{
-    static char b[12];
-    b[0] = '\0';
 
-    long z;
-    for (z = 128; z > 0; z >>= 1)
+
+void imprimirBinario(int numero)
+{
+
+  for(int i=31 ;i>=0; i-- )
+  {
+    if(numero&(1<<i))
     {
-        strcat(b, ((x & z) == z) ? "1" : "0");
+      printf("1");
+
     }
-
-    return b;
-}
-
-void getBin(int num, char *str)
-{
-  *(str+24) = '\0';
-  int mask = 0x1000000 << 1;
-  while(mask >>= 1)
-    *str++ = !!(mask & num) + '0';
+    else
+    {
+      printf("0");
+    }
+  }
+  //printf("\n");
 }
 
 /************************************************************/
@@ -154,15 +152,13 @@ void imprimirCache(cache miCache)
   printf("\t**Associativity : %u\n",  miCache.associativity);
   printf("\t**Num Sets :      %u\n",  miCache.n_sets);
 
-  char index_mask[25];
-  getBin(miCache.index_mask, index_mask);
-  printf("Index Mask :  %s   || %d  \n",   index_mask, miCache.index_mask);   
 
-  char index_mask_offset[25];
-  getBin(miCache.index_mask_offset, index_mask_offset);
-  printf("Offset Mask : %s   || %d  \n",   index_mask_offset , miCache.index_mask_offset);    
-  printf("\tContents: %u\n\n\n",  miCache.contents);   
+  printf("Index Mask :  %d  || ",   miCache.index_mask);  
+  imprimirBinario(miCache.index_mask); 
 
+  printf("\nOffset Mask : %d      || ",  miCache.index_mask_offset);   
+  imprimirBinario(miCache.index_mask_offset); 
+  printf("\tContents: %u\n\n\n",  miCache.contents); 
 
 }
 
@@ -175,10 +171,22 @@ void perform_access(addr, access_type)
   //Imprimiendo las direcciones
   printf("\n\n------Realizando acceso a  Cache-----" );
   printf("\nAdress Hexadecimal:   %x  ",  addr);
+
+  //
+  int offset_size=LOG2(cache_block_size);
+
+  int  ones_mask=0xffffff;
+  int  numero = (int)ones_mask;
+  printf("\nMascara de unos:      ");
+  imprimirBinario(numero);
+
+
   int intAddr =(int)addr;
   printf("\nAdress Decimal:       %d  ",  intAddr);
-  printf("\nAdress Binario:       %s\n", byte_to_binary(intAddr));
+  printf("\nAdress Binario:       ");
+  imprimirBinario(intAddr);
 
+  
 
 
 
