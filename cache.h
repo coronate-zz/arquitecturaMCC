@@ -43,6 +43,12 @@ typedef struct cache_ {
   int n_sets;			/* number of cache sets */
   unsigned index_mask;		/* mask to find cache index */
   int index_mask_offset;	/* number of zero bits in mask */
+  
+  int tag_mask;  /* number of zero bits in mask */
+  int tag_mask_offset;
+
+  int offset_mask;
+  
   Pcache_line *LRU_head;	/* head of LRU list for each set */
   Pcache_line *LRU_tail;	/* tail of LRU list for each set */
   int *set_contents;		/* number of valid entries in set */
