@@ -70,6 +70,6 @@ void insert();
 void dump_settings();
 void print_stats();
 void imprimirCache();
-
+const char *byte_to_binary();
 /* macros */
 #define LOG2(x) ((int) rint((log((double) (x))) / (log(2.0))))

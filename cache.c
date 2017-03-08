@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
+#include <string.h>
 #include "cache.h"
 #include "main.h"
 
@@ -28,6 +28,30 @@ static cache c1;
 static cache c2;
 static cache_stat cache_stat_inst;
 static cache_stat cache_stat_data;
+
+
+
+const char *byte_to_binary(int x)
+{
+    static char b[12];
+    b[0] = '\0';
+
+    long z;
+    for (z = 128; z > 0; z >>= 1)
+    {
+        strcat(b, ((x & z) == z) ? "1" : "0");
+    }
+
+    return b;
+}
+
+void getBin(int num, char *str)
+{
+  *(str+24) = '\0';
+  int mask = 0x1000000 << 1;
+  while(mask >>= 1)
+    *str++ = !!(mask & num) + '0';
+}
 
 /************************************************************/
 void set_cache_param(param, value)
@@ -95,6 +119,8 @@ void init_cache_helper(cache *c, int size){
     bits_set = LOG2(c->n_sets);
     c->index_mask = (1<< (bits_set+bits_offset)) - 1;
     c->index_mask_offset = bits_offset;
+
+    //debemos calcular el 
     c->LRU_head = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
     c->LRU_tail = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
     c->set_contents = (int*)malloc(sizeof(int)*c->n_sets);
@@ -111,37 +137,35 @@ void init_cache()
 {
 
   init_cache_helper(&c1, cache_usize);
+  printf("\nNUMERO SETS : \n%d\n", c1.n_sets );
   imprimirCache(c1);
+
+  //char str[25];
+  //getBin(16777215 , str);
+  //printf("\nSTR:  %s\n", str);
+
 }
 /************************************************************/
 void imprimirCache(cache miCache)
 {
 
   printf("*** Datos en Cache ***" );
-  printf("\n\t**Size: %u\n",  miCache.size);
+  printf("\n\t**Size:         %u\n",  miCache.size);
   printf("\t**Associativity : %u\n",  miCache.associativity);
-  printf("\t**Num Sets : %u\n",  miCache.n_sets);
+  printf("\t**Num Sets :      %u\n",  miCache.n_sets);
 
-  printf("\tIndex Mask : %u\n",  miCache.index_mask);   
-  printf("\tOffset Mask : %u\n",  miCache.index_mask_offset);    
+  char index_mask[25];
+  getBin(miCache.index_mask, index_mask);
+  printf("Index Mask :  %s   || %d  \n",   index_mask, miCache.index_mask);   
+
+  char index_mask_offset[25];
+  getBin(miCache.index_mask_offset, index_mask_offset);
+  printf("Offset Mask : %s   || %d  \n",   index_mask_offset , miCache.index_mask_offset);    
   printf("\tContents: %u\n\n\n",  miCache.contents);   
 
 
 }
 
-const char *byte_to_binary(int x)
-{
-    static char b[9];
-    b[0] = '\0';
-
-    int z;
-    for (z = 128; z > 0; z >>= 1)
-    {
-        strcat(b, ((x & z) == z) ? "1" : "0");
-    }
-
-    return b;
-}
 
 /************************************************************/
 void perform_access(addr, access_type)
@@ -154,6 +178,7 @@ void perform_access(addr, access_type)
   int intAddr =(int)addr;
   printf("\nAdress Decimal:       %d  ",  intAddr);
   printf("\nAdress Binario:       %s\n", byte_to_binary(intAddr));
+
 
 
 
