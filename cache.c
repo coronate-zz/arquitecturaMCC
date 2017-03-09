@@ -32,6 +32,17 @@ static cache_stat cache_stat_data;
 
 
 
+unsigned mascara(int n1, int n2)
+{
+  /* Esta funcion caclula la mascara para el numero n1
+  * y la desplaza n2 digitos a la izquierda:
+  Ejemplo Sea n1=5, n2=3 la funcion genera 
+          * (2^5-1)=0000011111
+          * desplaza 3 = 0011111000 
+  */
+  return(((int)pow(2,n1)-1)<<n2);
+
+}
 
 void imprimirBinario(int numero)
 {
@@ -115,8 +126,14 @@ void init_cache_helper(cache *c, int size){
     c->n_sets = size/(cache_block_size * c->associativity);
     bits_offset = LOG2(cache_block_size);
     bits_set = LOG2(c->n_sets);
-    c->index_mask = (1<< (bits_set+bits_offset)) - 1;
+
     c->index_mask_offset = bits_offset;
+    c->index_mask = mascara(bits_set, c->index_mask_offset);
+
+    c->offset_mask = mascara(bits_offset,0);
+    c->offset_mask_offset= bits_offset;
+    c->tag_mask_offset = bits_offset+bits_set;
+    c->tag_mask = mascara((32-c->tag_mask_offset), c->tag_mask_offset);
 
     //debemos calcular el 
     c->LRU_head = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
@@ -135,7 +152,6 @@ void init_cache()
 {
 
   init_cache_helper(&c1, cache_usize);
-  printf("\nNUMERO SETS : \n%d\n", c1.n_sets );
   imprimirCache(c1);
 
   //char str[25];
@@ -151,14 +167,16 @@ void imprimirCache(cache miCache)
   printf("\n\t**Size:         %u\n",  miCache.size);
   printf("\t**Associativity : %u\n",  miCache.associativity);
   printf("\t**Num Sets :      %u\n",  miCache.n_sets);
+  printf("\t**Contents: %u",  miCache.contents); 
 
+  printf("\nTag Mask : %d      || ",  miCache.tag_mask);   
+  imprimirBinario(miCache.tag_mask); 
 
-  printf("Index Mask :  %d  || ",   miCache.index_mask);  
+  printf("\nIndex Mask :  %d  || ",   miCache.index_mask);  
   imprimirBinario(miCache.index_mask); 
 
-  printf("\nOffset Mask : %d      || ",  miCache.index_mask_offset);   
-  imprimirBinario(miCache.index_mask_offset); 
-  printf("\tContents: %u\n\n\n",  miCache.contents); 
+  printf("\nOffset Mask : %d      || ",  miCache.offset_mask);   
+  imprimirBinario(miCache.offset_mask); 
 
 }
 
@@ -175,16 +193,26 @@ void perform_access(addr, access_type)
   //
   int offset_size=LOG2(cache_block_size);
 
-  int  ones_mask=0xffffff;
-  int  numero = (int)ones_mask;
-  printf("\nMascara de unos:      ");
-  imprimirBinario(numero);
-
-
   int intAddr =(int)addr;
   printf("\nAdress Decimal:       %d  ",  intAddr);
   printf("\nAdress Binario:       ");
   imprimirBinario(intAddr);
+
+  int addrIndex, addrTag, addrOffset;
+  addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
+  addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
+  addrOffset=(c1.offset_mask&addr);
+
+  printf("\n\nTagBits: %d     IndexBits: %d   OffsetBits: %d",c1.tag_mask_offset, c1.index_mask_offset, c1.offset_mask_offset );
+  printf("\nImprimiendo Tag:    %d || ", addrTag);
+  imprimirBinario(c1.tag_mask);
+  printf("\nImprimiendo Index:  %d || ", addrIndex );
+  imprimirBinario(addrIndex);
+  printf("\nImprimiendo Offset: %d || ", addrOffset);
+  imprimirBinario(addrOffset);
+
+  printf("\n\n\n");
+
 
   
 

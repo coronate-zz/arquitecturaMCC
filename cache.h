@@ -44,10 +44,11 @@ typedef struct cache_ {
   unsigned index_mask;		/* mask to find cache index */
   int index_mask_offset;	/* number of zero bits in mask */
   
-  int tag_mask;  /* number of zero bits in mask */
+  unsigned tag_mask;  /* number of zero bits in mask */
   int tag_mask_offset;
 
-  int offset_mask;
+  unsigned offset_mask;
+  int offset_mask_offset;
   
   Pcache_line *LRU_head;	/* head of LRU list for each set */
   Pcache_line *LRU_tail;	/* tail of LRU list for each set */
