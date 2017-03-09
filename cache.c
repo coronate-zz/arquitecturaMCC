@@ -135,7 +135,6 @@ void init_cache_helper(cache *c, int size){
     c->tag_mask_offset = bits_offset+bits_set;
     c->tag_mask = mascara((32-c->tag_mask_offset), c->tag_mask_offset);
 
-    //debemos calcular el 
     c->LRU_head = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
     c->LRU_tail = (Pcache_line*)malloc(sizeof(Pcache_line)*c->n_sets);
     c->set_contents = (int*)malloc(sizeof(int)*c->n_sets);
@@ -190,38 +189,101 @@ void perform_access(addr, access_type)
   printf("\n\n------Realizando acceso a  Cache-----" );
   printf("\nAdress Hexadecimal:   %x  ",  addr);
 
-  //
-  int offset_size=LOG2(cache_block_size);
-
+  
   int intAddr =(int)addr;
   printf("\nAdress Decimal:       %d  ",  intAddr);
   printf("\nAdress Binario:       ");
   imprimirBinario(intAddr);
 
-  int addrIndex, addrTag, addrOffset;
+  unsigned addrIndex, addrTag, addrOffset;
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
   addrOffset=(c1.offset_mask&addr);
 
   printf("\n\nTagBits: %d     IndexBits: %d   OffsetBits: %d",c1.tag_mask_offset, c1.index_mask_offset, c1.offset_mask_offset );
   printf("\nImprimiendo Tag:    %d || ", addrTag);
-  imprimirBinario(c1.tag_mask);
+  imprimirBinario(addrTag);
   printf("\nImprimiendo Index:  %d || ", addrIndex );
   imprimirBinario(addrIndex);
   printf("\nImprimiendo Offset: %d || ", addrOffset);
   imprimirBinario(addrOffset);
 
+
+  if(access_type==0)
+  {
+    if(cache_split==1)
+    {
+      //Tenemos doble cache DATA-INSTRUCCION
+    }
+    else
+    {
+     // perform_readData(addrIndex,addrTag);
+
+    }
+
+  }
+  else if(access_type==1)
+  {
+    printf("\nWrite Data\n");
+
+  }
+  else
+  {
+    printf("\nRead Instruction\n");
+    if(cache_split==1)
+    {
+      //Tenemos doble cache DATA-INSTRUCCION
+    }
+    else
+    {
+      //Cache unificado
+      perform_readData(addrIndex, addrTag);
+
+    }
+
+  }
+
   printf("\n\n\n");
-
-
-  
-
-
 
   /* handle an access to the cache */
 
 }
 /************************************************************/
+void perform_readData(unsigned addrIndex, unsigned addrTag )
+{
+  /* Los apuntadores funcionan de la siguiente manera:
+  * - c1.LRU_head[addrIndex]= &cacheline_build;  
+  *           LRU_head es un apuntador que apunta al apuntador de
+  *           un cache_line, cuando escribimos LRU_head[index] esatamos
+  *           seleccionando el contenido de un apuntador por lo que 
+  *           LRU_head[index] solo será un apuntador a un cache_line.
+  * - item= &cacheline_build;
+  *           Es un apuntador de cache_line y por lo tanto podemos asignarle
+  *           la dirección de un cache_line ya creado.
+  * *head =&cacheline_build  || **head= cacheline_build;
+
+  *
+  */
+  printf("Read Data\n");
+
+  Pcache_line *head, item;
+  cache_line  cacheline_build; 
+  cacheline_build.tag =addrIndex;
+
+  item= &cacheline_build;
+  //**head=cacheline_build;
+
+  insert(c1.LRU_head, c1.LRU_tail, item );
+
+
+  //c1.LRU_head[addrIndex]; //Falta crear un cline para poder acceder al tag ahora es null 
+  //printf("\n HeadLine : %s",headLine);
+  //*headLine->tag= addrTag;
+  printf("\nitem tag: %d\n", item->tag );
+  //printf("\nHead tag: %d\n", (**head).tag );
+
+}
+
 
 /************************************************************/
 void flush()
@@ -235,7 +297,7 @@ void flush()
 /************************************************************/
 void delete(head, tail, item)
   Pcache_line *head, *tail;
-  Pcache_line item; //Esto esta raro no es un apuntador y sin embargo se usa item->LRU_prev
+  Pcache_line item;
 {
   if (item->LRU_prev) { 
     item->LRU_prev->LRU_next = item->LRU_next;
@@ -250,6 +312,8 @@ void delete(head, tail, item)
     /* item at tail */
     *tail = item->LRU_prev;
   }
+
+
 }
 /************************************************************/
 
@@ -259,15 +323,24 @@ void insert(head, tail, item)
   Pcache_line *head, *tail;
   Pcache_line item;
 {
-  item->LRU_next = *head;
+  item->LRU_next = *head; 
+  /* head es un Pcache_line y tiene el adress de una cahche_line
+   * item->LRU_next llama al atributo LRU_next de item que resulta 
+   * ser el adress de un cahche_line. *head e item->LRU_next estan
+   * en el mismo 'nivel'. 
+   * => head = Pcache_line * head
+   * => item = cache_line  * item 
+  */
   item->LRU_prev = (Pcache_line)NULL;
 
-  if (item->LRU_next)
+  if (item->LRU_next) //Si hay algun elemento en la linea
     item->LRU_next->LRU_prev = item;
   else
     *tail = item;
 
   *head = item;
+
+
 }
 /************************************************************/
 
