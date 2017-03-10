@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdbool.h>
 #include "cache.h"
 #include "main.h"
 
@@ -195,10 +196,9 @@ void perform_access(addr, access_type)
   printf("\nAdress Binario:       ");
   imprimirBinario(intAddr);
 
-  unsigned addrIndex, addrTag, addrOffset;
+  int addrIndex, addrTag, addrOffset;
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
-  addrOffset=(c1.offset_mask&addr);
 
   printf("\n\nTagBits: %d     IndexBits: %d   OffsetBits: %d",c1.tag_mask_offset, c1.index_mask_offset, c1.offset_mask_offset );
   printf("\nImprimiendo Tag:    %d || ", addrTag);
@@ -208,40 +208,119 @@ void perform_access(addr, access_type)
   printf("\nImprimiendo Offset: %d || ", addrOffset);
   imprimirBinario(addrOffset);
 
+   
+  switch(access_type){
+        case TRACE_INST_LOAD:
+        printf("\nEjecutando Lectura Instruccion" );
+            cache_stat_inst.accesses++;
+            if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+                cache_stat_inst.misses++;
+                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+                c1.LRU_head[addrIndex]->tag=addrTag;
+                printf("\nPrimer dato ingresado");
+                c1.LRU_head[addrIndex]->dirty=0;
+                cache_stat_inst.demand_fetches+=4;
+            }
+            else // Hay infromacion, queremos ver si el dato se encuentra en cache
+            {
+                Pcache_line compare=c1.LRU_head[addrIndex]; //apuntador a cache_line
+                bool flagEncontrado=FALSE;
+                bool flagNext=TRUE ;
+                int cont=1;
+                while( cont<=c1.associativity && flagNext && !flagEncontrado)
+                {
+                    if(compare->tag==addrTag) //encontramos en cache la isntruccion
+                    {
+                        flagEncontrado=TRUE;
+                        printf("\nInstruccion encontrado en cache" );
+                        //el orden debe cambairse ahora head=compare; compare->LRU_next=head
+                        //compare->LRU_prev->LRU_next= compare->LRU_next
+                        //compare->LRU_next->LRU_prev= compare->LRU_prev
+                        //compare->LRU_next=head;
+                        //Todo esto equivale a borrar y volver a meter compare
+                        //=> delete(head, tail , compare)
+                        //=> insert(head, tail, compare)
+                    }
+                    else
+                    {
+                        if(compare->LRU_next==NULL)
+                        {
+                            flagNext=FALSE;
+                        }
+                        else
+                        {
+                            cont ++;
+                        }
+                    }
+                }
+                if(flagEncontrado) //el dato esta en memoria
+                {
+                    //Que estadisticas aumentan cuando encontramos datos?
+                }
+                else
+                {
+                    if(c1.set_contents[addrIndex]<c1.associativity)//Aun hay espacio
+                    {
+                        Pcache_line item;
+                        item->tag=addrTag;
+                        insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+                    }
+                    else //Es necesario Borrar
+                    {
+                        Pcache_line item;
+                        item->tag=addrTag;
+                        insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+                        delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], c1.LRU_tail[addrIndex]);
+                    }
+                }
 
-  if(access_type==0)
-  {
-    if(cache_split==1)
-    {
-      //Tenemos doble cache DATA-INSTRUCCION
+
+            }
+            break;
+        case TRACE_DATA_LOAD:
+            cache_stat_data.accesses++;
+            printf("\nEjecutando Data Load" );
+
+            if(c1.LRU_head[addrIndex]==(Pcache_line)NULL){  // Compulsory miss
+                cache_stat_data.misses++;
+                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+                c1.LRU_head[addrIndex]->tag=addrTag;
+                c1.LRU_head[addrIndex]->dirty=0;
+                cache_stat_data.demand_fetches+=4;
+            } else if(c1.LRU_head[addrIndex]->tag!=addrTag){  // Cache miss
+                if(c1.LRU_head[addrIndex]->dirty) { // Hay que guardar bloque
+                    cache_stat_data.copies_back+=4;
+                }
+                cache_stat_data.replacements++;
+                cache_stat_data.demand_fetches+=4;
+                c1.LRU_head[addrIndex]->tag=addrTag;
+                c1.LRU_head[addrIndex]->dirty=0;
+            }
+            break;
+        case TRACE_DATA_STORE:
+            cache_stat_data.accesses++;
+            printf("\nEjecutando Data Store" );
+
+            if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+                cache_stat_data.misses++;
+                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+                c1.LRU_head[addrIndex]->tag=addrTag;
+                c1.LRU_head[addrIndex]->dirty=1;
+                cache_stat_data.demand_fetches+=4;
+            } else if(c1.LRU_head[addrIndex]->tag!=addrTag){  // Cache miss
+                if(c1.LRU_head[addrIndex]->dirty) { // Hay que guardar bloque
+                    cache_stat_data.copies_back+=4;
+                }
+                cache_stat_data.misses++;
+                cache_stat_data.replacements++;
+                cache_stat_data.demand_fetches+=4;
+                c1.LRU_head[addrIndex]->tag=addrTag;
+                c1.LRU_head[addrIndex]->dirty=1;
+            }
+            else
+                c1.LRU_head[addrIndex]->dirty=1;
+            break;
     }
-    else
-    {
-     // perform_readData(addrIndex,addrTag);
-
-    }
-
-  }
-  else if(access_type==1)
-  {
-    printf("\nWrite Data\n");
-
-  }
-  else
-  {
-    printf("\nRead Instruction\n");
-    if(cache_split==1)
-    {
-      //Tenemos doble cache DATA-INSTRUCCION
-    }
-    else
-    {
-      //Cache unificado
-      perform_readData(addrIndex, addrTag);
-
-    }
-
-  }
 
   printf("\n\n\n");
 
@@ -273,7 +352,7 @@ void perform_readData(unsigned addrIndex, unsigned addrTag )
   item= &cacheline_build;
   //**head=cacheline_build;
 
-  insert(c1.LRU_head, c1.LRU_tail, item );
+  insert(&c1.LRU_head[addrIndex], c1.LRU_tail[addrIndex], item );
 
 
   //c1.LRU_head[addrIndex]; //Falta crear un cline para poder acceder al tag ahora es null 
@@ -323,26 +402,26 @@ void insert(head, tail, item)
   Pcache_line *head, *tail;
   Pcache_line item;
 {
-  item->LRU_next = *head; 
-  /* head es un Pcache_line y tiene el adress de una cahche_line
-   * item->LRU_next llama al atributo LRU_next de item que resulta 
-   * ser el adress de un cahche_line. *head e item->LRU_next estan
-   * en el mismo 'nivel'. 
-   * => head = Pcache_line * head
-   * => item = cache_line  * item 
-  */
+  item->LRU_next = *head; //*head=NULL cuando no hay elementos
+
   item->LRU_prev = (Pcache_line)NULL;
 
   if (item->LRU_next) //Si hay algun elemento en la linea
     item->LRU_next->LRU_prev = item;
   else
-    *tail = item;
+    *tail = item; 
+    /*tail no se reubica y solo se asigna para el primer elemento
+    * para mover el tail(jaja) debemos eliminar el ultimo elemento
+    * (least bext) y el tail se asignara al prev del item:
+    * tail = item->LRU_prev; 
+    */
+
 
   *head = item;
 
 
 }
-/************************************************************/
+/* ********************************************************** */
 
 /************************************************************/
 void dump_settings()

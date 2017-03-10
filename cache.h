@@ -38,13 +38,13 @@ typedef struct cache_line_ {
 } cache_line, *Pcache_line;
 
 typedef struct cache_ {
-  int size;			/* cache size */
-  int associativity;		/* cache associativity */
-  int n_sets;			/* number of cache sets */
+  int size;			          /* cache size */
+  int associativity;		  /* cache associativity */
+  int n_sets;			        /* number of cache sets */
   unsigned index_mask;		/* mask to find cache index */
   int index_mask_offset;	/* number of zero bits in mask */
   
-  unsigned tag_mask;  /* number of zero bits in mask */
+  unsigned tag_mask;      /* number of zero bits in mask */
   int tag_mask_offset;
 
   unsigned offset_mask;
@@ -52,18 +52,18 @@ typedef struct cache_ {
   
   Pcache_line *LRU_head;	/* head of LRU list for each set */
   Pcache_line *LRU_tail;	/* tail of LRU list for each set */
-  int *set_contents;		/* number of valid entries in set */
-  int contents;			/* number of valid entries in cache */
+  int *set_contents;		  /* number of valid entries in set */
+  int contents;			      /* number of valid entries in cache */
 } cache, *Pcache;
 
 
 
 typedef struct cache_stat_ {
-  int accesses;			/* number of memory references */
-  int misses;			/* number of cache misses */
-  int replacements;		/* number of misses that cause replacments */
-  int demand_fetches;		/* number of fetches */
-  int copies_back;		/* number of write backs */
+  int accesses;		       /* number of memory references */
+  int misses;			       /* number of cache misses */
+  int replacements;		   /* number of misses that cause replacments */
+  int demand_fetches;		 /* number of fetches */
+  int copies_back;		   /* number of write backs */
 } cache_stat, *Pcache_stat;
 
 
