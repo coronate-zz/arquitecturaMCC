@@ -63,6 +63,73 @@ void imprimirBinario(int numero)
   //printf("\n");
 }
 
+void imprimirCacheCompleto(cache *c)
+{
+  printf("\n-----------------------------------------" );
+  printf("\n\tImprimeindo Cache Completo:");
+  Pcache_line item =malloc(sizeof(cache_line));  
+
+
+  for( int cont=0; cont <= c1.n_sets; cont ++   )
+  {
+    if(c->LRU_head[cont]==NULL)
+    {
+      //no hay datos en ese index
+    }
+    else
+    {
+      item= c->LRU_head[cont];
+
+      printf("\n\n\t Index: %d ",cont);
+      printf("\n\t Tags: " );
+
+
+
+      for(int i=0; i<c->associativity; i++)
+      {
+        if(item == NULL)
+        {
+          printf("||   NULL    " );
+        }
+        else
+        {
+          printf("||   %d    ", item->tag);
+
+        }
+       // printf("\n Adress de next:  %x" , item->LRU_next) );
+        item=item->LRU_next; //No se puede hacer asignacion completa de objetos
+       // printf("\nAdress de item: %x", item );
+
+      }
+    }
+
+    //end for cont
+  }
+    printf("\n-----------------------------------------" );
+
+}
+void imprimirDirecciones(unsigned addr )
+{
+  printf("\nAdress Hexadecimal:   %x  ",  addr);
+  
+  int intAddr =(int)addr;
+  printf("\nAdress Decimal:       %d  ",  intAddr);
+  printf("\nAdress Binario:       ");
+  imprimirBinario(intAddr);
+
+  int addrIndex, addrTag, addrOffset;
+  addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
+  addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
+
+  printf("\n\nTagBits: %d     IndexBits: %d   OffsetBits: %d",c1.tag_mask_offset, c1.index_mask_offset, c1.offset_mask_offset );
+  printf("\nImprimiendo Tag:    %d || ", addrTag);
+  imprimirBinario(addrTag);
+  printf("\nImprimiendo Index:  %d || ", addrIndex );
+  imprimirBinario(addrIndex);
+
+
+}
+
 /************************************************************/
 void set_cache_param(param, value)
   int param;
@@ -186,34 +253,21 @@ void perform_access(addr, access_type)
   unsigned addr, access_type;
 {
 
-  //Imprimiendo las direcciones
-  printf("\n\n------Realizando acceso a  Cache-----" );
-  printf("\nAdress Hexadecimal:   %x  ",  addr);
-
-  
-  int intAddr =(int)addr;
-  printf("\nAdress Decimal:       %d  ",  intAddr);
-  printf("\nAdress Binario:       ");
-  imprimirBinario(intAddr);
-
   int addrIndex, addrTag, addrOffset;
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
 
-  printf("\n\nTagBits: %d     IndexBits: %d   OffsetBits: %d",c1.tag_mask_offset, c1.index_mask_offset, c1.offset_mask_offset );
-  printf("\nImprimiendo Tag:    %d || ", addrTag);
-  imprimirBinario(addrTag);
-  printf("\nImprimiendo Index:  %d || ", addrIndex );
-  imprimirBinario(addrIndex);
-  printf("\nImprimiendo Offset: %d || ", addrOffset);
-  imprimirBinario(addrOffset);
-
+  //Imprimiendo las direcciones
+  printf("\n\n------Realizando acceso a  Cache-----" );
+  imprimirDirecciones(addr);
+  
    
   switch(access_type){
         case TRACE_INST_LOAD:
         printf("\nEjecutando Lectura Instruccion" );
             cache_stat_inst.accesses++;
-            if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+            if(c1.LRU_head[addrIndex]==NULL)
+            {  // Compulsory miss
                 cache_stat_inst.misses++;
                 c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
                 c1.LRU_head[addrIndex]->tag=addrTag;
@@ -223,12 +277,15 @@ void perform_access(addr, access_type)
             }
             else // Hay infromacion, queremos ver si el dato se encuentra en cache
             {
-                Pcache_line compare=c1.LRU_head[addrIndex]; //apuntador a cache_line
+                Pcache_line compare= malloc(sizeof(cache_line));  
+                compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
                 bool flagEncontrado=FALSE;
                 bool flagNext=TRUE ;
                 int cont=1;
                 while( cont<=c1.associativity && flagNext && !flagEncontrado)
                 {
+                  //printf("\nTAG: %d",compare->tag );
+                  //printf("\nAddress: %d\n", addrTag );
                     if(compare->tag==addrTag) //encontramos en cache la isntruccion
                     {
                         flagEncontrado=TRUE;
@@ -241,15 +298,20 @@ void perform_access(addr, access_type)
                         //=> delete(head, tail , compare)
                         //=> insert(head, tail, compare)
                     }
-                    else
-                    {
+                    else //no encontramos el tag en una de las paginas
+                    { 
                         if(compare->LRU_next==NULL)
                         {
-                            flagNext=FALSE;
+                          printf("\nNo hay next\n" );
+                          flagNext=FALSE;
+                          break;
+
                         }
                         else
                         {
-                            cont ++;
+                          cont ++;
+                          compare= compare->LRU_next;
+                          
                         }
                     }
                 }
@@ -259,18 +321,34 @@ void perform_access(addr, access_type)
                 }
                 else
                 {
+                    printf("\n\tEl dato NO esta en memoria\n" );
+
                     if(c1.set_contents[addrIndex]<c1.associativity)//Aun hay espacio
                     {
+
                         Pcache_line item;
+                        item = malloc(sizeof(cache_line));
                         item->tag=addrTag;
                         insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+                        c1.set_contents[addrIndex]++;
+                        printf("\nCabeza: %d  Next: %d   \n" , c1.LRU_head[addrIndex]->tag, c1.LRU_head[addrIndex]->LRU_next->tag);
+
+                        //imprimirCacheCompleto(&c1);
+
+
                     }
                     else //Es necesario Borrar
                     {
+                        printf("\n\nBorrando Datos..." );
+                        printf("\n\tCache antes de Cambios:");
+                        //imprimirCacheCompleto(&c1);
                         Pcache_line item;
+                        item = malloc(sizeof(cache_line));
                         item->tag=addrTag;
-                        insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
-                        delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], c1.LRU_tail[addrIndex]);
+                        //insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+                        //delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], c1.LRU_tail[addrIndex]);
+                        printf("\n\tCache despues de Cambios:");
+                        //imprimirCacheCompleto(&c1);
                     }
                 }
 
@@ -281,47 +359,17 @@ void perform_access(addr, access_type)
             cache_stat_data.accesses++;
             printf("\nEjecutando Data Load" );
 
-            if(c1.LRU_head[addrIndex]==(Pcache_line)NULL){  // Compulsory miss
-                cache_stat_data.misses++;
-                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                c1.LRU_head[addrIndex]->tag=addrTag;
-                c1.LRU_head[addrIndex]->dirty=0;
-                cache_stat_data.demand_fetches+=4;
-            } else if(c1.LRU_head[addrIndex]->tag!=addrTag){  // Cache miss
-                if(c1.LRU_head[addrIndex]->dirty) { // Hay que guardar bloque
-                    cache_stat_data.copies_back+=4;
-                }
-                cache_stat_data.replacements++;
-                cache_stat_data.demand_fetches+=4;
-                c1.LRU_head[addrIndex]->tag=addrTag;
-                c1.LRU_head[addrIndex]->dirty=0;
-            }
+
             break;
         case TRACE_DATA_STORE:
             cache_stat_data.accesses++;
             printf("\nEjecutando Data Store" );
 
-            if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
-                cache_stat_data.misses++;
-                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                c1.LRU_head[addrIndex]->tag=addrTag;
-                c1.LRU_head[addrIndex]->dirty=1;
-                cache_stat_data.demand_fetches+=4;
-            } else if(c1.LRU_head[addrIndex]->tag!=addrTag){  // Cache miss
-                if(c1.LRU_head[addrIndex]->dirty) { // Hay que guardar bloque
-                    cache_stat_data.copies_back+=4;
-                }
-                cache_stat_data.misses++;
-                cache_stat_data.replacements++;
-                cache_stat_data.demand_fetches+=4;
-                c1.LRU_head[addrIndex]->tag=addrTag;
-                c1.LRU_head[addrIndex]->dirty=1;
-            }
-            else
-                c1.LRU_head[addrIndex]->dirty=1;
             break;
     }
 
+
+  //imprimirCacheCompleto(&c1);
   printf("\n\n\n");
 
   /* handle an access to the cache */
@@ -404,7 +452,7 @@ void insert(head, tail, item)
 {
   item->LRU_next = *head; //*head=NULL cuando no hay elementos
 
-  item->LRU_prev = (Pcache_line)NULL;
+  item->LRU_prev = NULL;
 
   if (item->LRU_next) //Si hay algun elemento en la linea
     item->LRU_next->LRU_prev = item;
