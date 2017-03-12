@@ -77,6 +77,7 @@ void insert();
 void dump_settings();
 void print_stats();
 void imprimirCache();
+void imprimirCacheCompleto();
 const char *byte_to_binary();
 void perform_readData();
 /* macros */

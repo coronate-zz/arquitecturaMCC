@@ -13,6 +13,7 @@
 
 /* cache configuration parameters */
 static int cache_split = 0;
+int numeroTraze =0;
 static int cache_usize = DEFAULT_CACHE_SIZE;
 static int cache_isize = DEFAULT_CACHE_SIZE; 
 static int cache_dsize = DEFAULT_CACHE_SIZE;
@@ -85,20 +86,20 @@ void imprimirCacheCompleto(cache *c)
 
 
 
-      for(int i=0; i<c->associativity; i++)
+      for(int i=0; i<=c->associativity; i++)
       {
-        if(item == NULL)
+        printf("||   %d    ", item->tag);
+        if(item->LRU_next== NULL)
         {
+          for(int j=0; j<c->associativity-i; j++)
+          {
           printf("||   NULL    " );
+          }
+          break;
         }
-        else
-        {
-          printf("||   %d    ", item->tag);
-
-        }
-       // printf("\n Adress de next:  %x" , item->LRU_next) );
+        
+       // printf("\n Adess de next:  %x" , item->LRU_next) );
         item=item->LRU_next; //No se puede hacer asignacion completa de objetos
-       // printf("\nAdress de item: %x", item );
 
       }
     }
@@ -252,15 +253,17 @@ void imprimirCache(cache miCache)
 void perform_access(addr, access_type)
   unsigned addr, access_type;
 {
-
+  numeroTraze++;
+  printf("\nNumero de Instriccion: %d", numeroTraze );
   int addrIndex, addrTag, addrOffset;
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
+  Pcache_line item;
+  item = malloc(sizeof(cache_line));
 
   //Imprimiendo las direcciones
   printf("\n\n------Realizando acceso a  Cache-----" );
   imprimirDirecciones(addr);
-  
    
   switch(access_type){
         case TRACE_INST_LOAD:
@@ -270,8 +273,12 @@ void perform_access(addr, access_type)
             {  // Compulsory miss
                 cache_stat_inst.misses++;
                 c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                c1.LRU_head[addrIndex]->tag=addrTag;
-                printf("\nPrimer dato ingresado");
+                
+                item->tag=addrTag;
+                c1.LRU_head[addrIndex]=item;
+                c1.LRU_tail[addrIndex]=item;
+
+                printf("\n\tPrimer dato ingresado");
                 c1.LRU_head[addrIndex]->dirty=0;
                 cache_stat_inst.demand_fetches+=4;
             }
@@ -289,7 +296,6 @@ void perform_access(addr, access_type)
                     if(compare->tag==addrTag) //encontramos en cache la isntruccion
                     {
                         flagEncontrado=TRUE;
-                        printf("\nInstruccion encontrado en cache" );
                         //el orden debe cambairse ahora head=compare; compare->LRU_next=head
                         //compare->LRU_prev->LRU_next= compare->LRU_next
                         //compare->LRU_next->LRU_prev= compare->LRU_prev
@@ -302,13 +308,14 @@ void perform_access(addr, access_type)
                     { 
                         if(compare->LRU_next==NULL)
                         {
-                          printf("\nNo hay next\n" );
+                          printf("\n\t\t**No hay next" );
                           flagNext=FALSE;
                           break;
 
                         }
                         else
                         {
+                          printf("\n\t\t**Buscando en next");
                           cont ++;
                           compare= compare->LRU_next;
                           
@@ -317,43 +324,45 @@ void perform_access(addr, access_type)
                 }
                 if(flagEncontrado) //el dato esta en memoria
                 {
+                    printf("\n\tEl dato ESTA en memoria" );
+
                     //Que estadisticas aumentan cuando encontramos datos?
                 }
                 else
                 {
-                    printf("\n\tEl dato NO esta en memoria\n" );
+                    printf("\n\tEl dato NO esta en memoria" );
 
                     if(c1.set_contents[addrIndex]<c1.associativity)//Aun hay espacio
                     {
 
-                        Pcache_line item;
-                        item = malloc(sizeof(cache_line));
                         item->tag=addrTag;
                         insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
                         c1.set_contents[addrIndex]++;
-                        printf("\nCabeza: %d  Next: %d   \n" , c1.LRU_head[addrIndex]->tag, c1.LRU_head[addrIndex]->LRU_next->tag);
-
-                        //imprimirCacheCompleto(&c1);
+                        printf("\n\t\t***Cabeza: %d  Next: %d   \n" , c1.LRU_head[addrIndex]->tag, c1.LRU_head[addrIndex]->LRU_next->tag);
+                        if( numeroTraze== 6 )
+                        {
+                        printf("\n\t\t***Cabeza: %d  Next: %d  NEXT: %d \n" , c1.LRU_head[addrIndex]->tag, c1.LRU_head[addrIndex]->LRU_next->tag, c1.LRU_head[addrIndex]->LRU_next->LRU_next->tag);
+                        }
 
 
                     }
                     else //Es necesario Borrar
                     {
-                        printf("\n\nBorrando Datos..." );
-                        printf("\n\tCache antes de Cambios:");
+                        printf("\n\t\t***Borrando Datos..." );
+                        printf("\n\t\tCache antes de Cambios:");
                         //imprimirCacheCompleto(&c1);
-                        Pcache_line item;
-                        item = malloc(sizeof(cache_line));
                         item->tag=addrTag;
                         //insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
                         //delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], c1.LRU_tail[addrIndex]);
-                        printf("\n\tCache despues de Cambios:");
+                        printf("\n\t\tCache despues de Cambios:");
                         //imprimirCacheCompleto(&c1);
                     }
                 }
 
 
             }
+                                    imprimirCacheCompleto(&c1);
+
             break;
         case TRACE_DATA_LOAD:
             cache_stat_data.accesses++;
