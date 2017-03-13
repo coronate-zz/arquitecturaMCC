@@ -209,7 +209,7 @@ void imprimirCacheCompleto(cache *c)
 {
   printf("\n-----------------------------------------------------" );
   printf("\n\tImprimeindo Cache Completo:");
-  Pcache_line item;// =malloc(sizeof(cache_line));  
+  Pcache_line item=malloc(sizeof(cache_line));  
 
 
   for( int cont=0; cont <= c1.n_sets; cont ++   )
@@ -412,7 +412,7 @@ void perform_access(addr, access_type)
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
   Pcache_line item;
-  //item = malloc(sizeof(cache_line));
+  item = malloc(sizeof(cache_line));
 
   //Imprimiendo las direcciones
   printf("\n\n---------------Realizando acceso a  Cache------------\n" );
@@ -437,7 +437,7 @@ void perform_access(addr, access_type)
         cache_stat_inst.demand_fetches+=4;
       }
       else {  // Hay infromacion, queremos ver si el dato se encuentra en cache
-        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        Pcache_line compare= malloc(sizeof(cache_line));  
         compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
@@ -500,7 +500,7 @@ void perform_access(addr, access_type)
         cache_stat_inst.demand_fetches+=4;
         c1.set_contents[addrIndex]++;
       } else { // Hay informacion, queremos ver si el dato se encuentra en cache
-        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        Pcache_line compare= malloc(sizeof(cache_line));  
         compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
@@ -547,7 +547,7 @@ void perform_access(addr, access_type)
         cache_stat_inst.demand_fetches+=4;
         c1.set_contents[addrIndex]++;
       } else { //Hay informacion
-        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        Pcache_line compare= malloc(sizeof(cache_line));  
         compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
@@ -581,7 +581,7 @@ void perform_access(addr, access_type)
 
   }
 
-  //imprimirCacheCompleto(&c1);
+  imprimirCacheCompleto(&c1);
   printf("\n\n\n");
   /* handle an access to the cache */
 
