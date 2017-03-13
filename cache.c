@@ -377,11 +377,12 @@ void init_cache()
     icache = &c2;
     init_cache_helper(dcache,cache_dsize);
     init_cache_helper(icache,cache_isize);
-    imprimirCache(dcache);
-    imprimirCache(icache);
+    imprimirCache(*dcache);
+    imprimirCache(*icache);
   } else {
-    init_cache_helper(&c1, cache_usize);
-    imprimirCache(c1);
+    dcache = &c1;
+    init_cache_helper(dcache, cache_usize);
+    imprimirCache(*dcache);
   }
 
 }
