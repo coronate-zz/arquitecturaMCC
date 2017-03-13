@@ -48,7 +48,7 @@ void dataStoreHit(Pcache_line compare, int addrIndex)
     insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
   } else {
     printf("\nData Store Hit /  WT");
-    cache_stat_data.copies_back+=4;
+    cache_stat_data.copies_back+=words_per_block;
     delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
     insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
   }
@@ -57,7 +57,7 @@ void dataStoreHit(Pcache_line compare, int addrIndex)
 void dataLoadMiss(int addrIndex, int addrTag,  Pcache_line item)
 {
   cache_stat_data.misses++;
-  cache_stat_data.demand_fetches+=4;
+  cache_stat_data.demand_fetches+=words_per_block;
   if(cache_writeback==FALSE) {
     printf("\nData Load Miss WT");
     if(c1.set_contents[addrIndex] < c1.associativity) {
@@ -69,7 +69,7 @@ void dataLoadMiss(int addrIndex, int addrTag,  Pcache_line item)
       //Es necesario Borrar
       printf("\n\t\t***Borrando Datos...");
       cache_stat_data.replacements++;
-      cache_stat_data.copies_back+=4;
+      cache_stat_data.copies_back+=words_per_block;
       // printf("\n\t\tCache antes de Cambios:");
       //imprimirCacheCompleto(&c1);
       item->tag=addrTag;
@@ -91,7 +91,7 @@ void dataLoadMiss(int addrIndex, int addrTag,  Pcache_line item)
       if(c1.LRU_tail[addrIndex]->dirty==1) {
         //EN este caso tenemos el bit dirty, accedemos a memoria
         printf("\n\t\t***Eliminando dato Dirty" );
-        cache_stat_data.copies_back+=4;
+        cache_stat_data.copies_back+=words_per_block;
       } else {
         //EN este caso tenemos el bit dirty, accedemos a memoria
         printf("\n\t\t***Eliminando dato Limpio" );
@@ -106,13 +106,13 @@ void dataStoreMiss(int addrIndex, int addrTag, Pcache_line item)
 {
   cache_stat_data.misses++;
   if(cache_writeback==FALSE && cache_writealloc==FALSE) {
-    cache_stat_data.copies_back+=4;
+    cache_stat_data.copies_back+=words_per_block;
     printf("\nData Store Miss WT / NWA" );
     printf("\n\t    ~~~~~  No se Modificara cache   ~~~~   ");
 
   } else if(cache_writeback==FALSE && cache_writealloc==TRUE) {
-    cache_stat_data.copies_back+=4;
-    cache_stat_data.demand_fetches+=4;
+    cache_stat_data.copies_back+=words_per_block;
+    cache_stat_data.demand_fetches+=words_per_block;
     printf("\nData Store Miss WT / WA" );
     if(c1.set_contents[addrIndex] < c1.associativity) {
       printf("\n\t\t**Aun hay espacio" );
@@ -128,7 +128,7 @@ void dataStoreMiss(int addrIndex, int addrTag, Pcache_line item)
     }
   } else if(cache_writeback==TRUE && cache_writealloc==FALSE) {
     
-    cache_stat_data.copies_back+=4;
+    cache_stat_data.copies_back+=words_per_block;
     /*Como el dato solo se modifica en Memoria, no debemos cambiar
     * nada en cache.
     */
@@ -146,7 +146,7 @@ void dataStoreMiss(int addrIndex, int addrTag, Pcache_line item)
                    esta simulación.
     */
     printf("\nData Store Miss WB / WA" );
-    cache_stat_data.demand_fetches+=4;
+    cache_stat_data.demand_fetches+=words_per_block;
     if(c1.set_contents[addrIndex] < c1.associativity) {
       printf("\n\t\t***Aun hay espacio" );
       item->tag=addrTag;
@@ -159,7 +159,7 @@ void dataStoreMiss(int addrIndex, int addrTag, Pcache_line item)
       if(c1.LRU_tail[addrIndex]->dirty==1) {
         //EN este caso tenemos el bit dirty, accedemos a memoria
         printf("\n\t\t***Eliminando dato Dirty" );
-        cache_stat_data.copies_back+=4;
+        cache_stat_data.copies_back+=words_per_block;
       } else {
         //EN este caso tenemos el bit dirty, accedemos a memoria
         printf("\n\t\t***Eliminando dato Limpio" );
@@ -372,12 +372,17 @@ void init_cache_helper(cache *c, int size){
 void init_cache() 
 {
 
-  init_cache_helper(&c1, cache_usize);
-  imprimirCache(c1);
-
-  //char str[25];
-  //getBin(16777215 , str);
-  //printf("\nSTR:  %s\n", str);
+  if(cache_split){
+    dcache = &c1;
+    icache = &c2;
+    init_cache_helper(dcache,cache_dsize);
+    init_cache_helper(icache,cache_isize);
+    imprimirCache(dcache);
+    imprimirCache(icache);
+  } else {
+    init_cache_helper(&c1, cache_usize);
+    imprimirCache(c1);
+  }
 
 }
 /************************************************************/
@@ -402,15 +407,13 @@ void imprimirCache(cache miCache)
 }
 
 
-/************************************************************/
-void perform_access(addr, access_type)
-  unsigned addr, access_type;
-{
+/* Helper method to perform accesses on split caches */
+void perform_access_helper(unsigned addr, unsigned access_type, cache *c){
   numeroTraze++;
   printf("\nNumero de Instriccion: %d", numeroTraze );
   int addrIndex, addrTag, addrOffset;
-  addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
-  addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
+  addrTag=   (c->tag_mask&addr)>>c->tag_mask_offset;
+  addrIndex= (c->index_mask&addr)>>c->index_mask_offset;
   Pcache_line item;
   item = malloc(sizeof(cache_line));
 
@@ -423,26 +426,26 @@ void perform_access(addr, access_type)
       printf("\n\nEjecutando Lectura Instruccion" );
       cache_stat_inst.accesses++;
 
-      if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+      if(c->LRU_head[addrIndex]==NULL){  // Compulsory miss
         cache_stat_inst.misses++;
-        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));// Deberias validar que hay memoria!!
+        c->LRU_head[addrIndex]=malloc(sizeof(cache_line));// Deberias validar que hay memoria!!
       
         item->tag=addrTag;
-        c1.LRU_head[addrIndex]=item;
-        c1.LRU_tail[addrIndex]=item;
+        c->LRU_head[addrIndex]=item;
+        c->LRU_tail[addrIndex]=item;
 
         printf("\n\tPrimer dato ingresado");
-        c1.LRU_head[addrIndex]->dirty=0;
-        c1.set_contents[addrIndex]++;
-        cache_stat_inst.demand_fetches+=4;
+        c->LRU_head[addrIndex]->dirty=0;
+        c->set_contents[addrIndex]++;
+        cache_stat_inst.demand_fetches+=words_per_block;
       }
       else {  // Hay infromacion, queremos ver si el dato se encuentra en cache
         Pcache_line compare= malloc(sizeof(cache_line));  
-        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        compare= c->LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
         int cont=1;
-        while( cont<=c1.associativity && flagNext && !flagEncontrado){
+        while( cont<=c->associativity && flagNext && !flagEncontrado){
           if(compare->tag==addrTag){  //encontramos en cache la isntruccion
               flagEncontrado=TRUE;
           } else if(compare->LRU_next==NULL){
@@ -457,27 +460,27 @@ void perform_access(addr, access_type)
         if(flagEncontrado) { //el dato esta en memoria
           //HIT
           printf("\n\t :: El dato ESTA en memoria :: \n" );
-          delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
-          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
-        } else if(c1.set_contents[addrIndex] < c1.associativity) { //Aun hay espacio
+          delete(&c->LRU_head[addrIndex], &c->LRU_tail[addrIndex], compare);
+          insert(&c->LRU_head[addrIndex], &c->LRU_tail[addrIndex], compare);
+        } else if(c->set_contents[addrIndex] < c->associativity) { //Aun hay espacio
           printf("\n\t:: El dato NO esta en memoria :: \n" );
           cache_stat_inst.misses++;
           item->tag=addrTag;
-          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
-          c1.set_contents[addrIndex]++;
-          cache_stat_inst.demand_fetches+=4;
+          insert(&c->LRU_head[addrIndex], &c->LRU_tail[addrIndex], item);
+          c->set_contents[addrIndex]++;
+          cache_stat_inst.demand_fetches+=words_per_block;
         } else { //Es necesario Borrar
           printf("\n\t:: El dato NO esta en memoria :: \n" );
           cache_stat_inst.misses++;
           printf("\n\t\t***Borrando Datos..." );
           cache_stat_inst.replacements++;
-          cache_stat_inst.demand_fetches+=4;
+          cache_stat_inst.demand_fetches+=words_per_block;
           item->tag=addrTag;
-          delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], c1.LRU_tail[addrIndex]);
-          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+          delete(&c->LRU_head[addrIndex], &c->LRU_tail[addrIndex], c->LRU_tail[addrIndex]);
+          insert(&c->LRU_head[addrIndex], &c->LRU_tail[addrIndex], item);
           // En cache unificado, podriamos tener un reemplazo de dato dirty
-          if (cache_split==0 && cache_writeback && c1.LRU_head[addrIndex]->dirty){
-            cache_stat_data.copies_back+=4;
+          if (cache_split==0 && cache_writeback && c->LRU_head[addrIndex]->dirty){
+            cache_stat_data.copies_back+=words_per_block;
           }
         }
       }
@@ -487,25 +490,25 @@ void perform_access(addr, access_type)
     case TRACE_DATA_LOAD:
       printf("\n\nEjecutando Data Load" );
       cache_stat_data.accesses++;
-      if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+      if(c->LRU_head[addrIndex]==NULL){  // Compulsory miss
         cache_stat_data.misses++;
-        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+        c->LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
         
         item->tag=addrTag;
-        c1.LRU_head[addrIndex]=item;
-        c1.LRU_tail[addrIndex]=item;
+        c->LRU_head[addrIndex]=item;
+        c->LRU_tail[addrIndex]=item;
 
         printf("\n\tPrimer dato ingresado");
-        c1.LRU_head[addrIndex]->dirty=0;
-        cache_stat_inst.demand_fetches+=4;
-        c1.set_contents[addrIndex]++;
+        c->LRU_head[addrIndex]->dirty=0;
+        cache_stat_inst.demand_fetches+=words_per_block;
+        c->set_contents[addrIndex]++;
       } else { // Hay informacion, queremos ver si el dato se encuentra en cache
         Pcache_line compare= malloc(sizeof(cache_line));  
-        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        compare= c->LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
         int cont=1;
-        while( cont<=c1.associativity && flagNext && !flagEncontrado) {
+        while( cont<=c->associativity && flagNext && !flagEncontrado) {
           //printf("\nTAG: %d",compare->tag );
           //printf("\nAddress: %d\n", addrTag );
           if(compare->tag==addrTag) { //encontramos en cache la instruccion
@@ -534,25 +537,25 @@ void perform_access(addr, access_type)
     case TRACE_DATA_STORE:
       cache_stat_data.accesses++;
       printf("\n\nEjecutando Data Store" );
-      if(c1.LRU_head[addrIndex]==NULL) {  // Compulsory miss
-        cache_stat_inst.misses++;
-        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+      if(c->LRU_head[addrIndex]==NULL) {  // Compulsory miss
+        cache_stat_data.misses++;
+        c->LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
         
         item->tag=addrTag;
-        c1.LRU_head[addrIndex]=item;
-        c1.LRU_tail[addrIndex]=item;
+        c->LRU_head[addrIndex]=item;
+        c->LRU_tail[addrIndex]=item;
 
         printf("\n\tPrimer dato ingresado");
-        c1.LRU_head[addrIndex]->dirty=0;
-        cache_stat_inst.demand_fetches+=4;
-        c1.set_contents[addrIndex]++;
+        c->LRU_head[addrIndex]->dirty=0;
+        cache_stat_inst.demand_fetches+=words_per_block;
+        c->set_contents[addrIndex]++;
       } else { //Hay informacion
         Pcache_line compare= malloc(sizeof(cache_line));  
-        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        compare= c->LRU_head[addrIndex]; //apuntador a cache_line
         bool flagEncontrado=FALSE;
         bool flagNext=TRUE ;
         int cont=1;
-        while( cont<=c1.associativity && flagNext && !flagEncontrado) {
+        while( cont<=c->associativity && flagNext && !flagEncontrado) {
           //printf("\nTAG: %d",compare->tag );
           //printf("\nAddress: %d\n", addrTag );
           if(compare->tag==addrTag) {
@@ -581,9 +584,30 @@ void perform_access(addr, access_type)
 
   }
 
-  imprimirCacheCompleto(&c1);
+  imprimirCacheCompleto(c);
   printf("\n\n\n");
   /* handle an access to the cache */
+
+
+
+}
+
+
+
+
+/************************************************************/
+void perform_access(addr, access_type)
+  unsigned addr, access_type;
+{
+  if (cache_split){
+    if (access_type==TRACE_INST_LOAD){
+      perform_access_helper(addr, access_type, icache);
+    } else {
+      perform_access_helper(addr, access_type, dcache);
+    }
+  } else {
+    perform_access_helper(addr, access_type, dcache);
+  }
 
 }
 /************************************************************/
@@ -627,7 +651,28 @@ void perform_readData(unsigned addrIndex, unsigned addrTag )
 void flush()
 {
 
-  /* flush the cache */
+  int i;
+  Pcache_line current;
+  //flush data
+  for(i = 0; i < c1.n_sets; i++){
+    if(c1.LRU_head[i]!=NULL){
+      for(current = c1.LRU_head[i]; current!=NULL; current=current->LRU_next){
+        if(current->dirty){
+          cache_stat_data.copies_back+=words_per_block;
+        }
+      }
+    }
+  }
+  // flush inst
+  for(i = 0; i < c2.n_sets; i++){
+    if(c2.LRU_head[i]!=NULL){
+      for(current = c2.LRU_head[i]; current!=NULL; current=current->LRU_next){
+        if(current->dirty){
+          cache_stat_inst.copies_back+=words_per_block;
+        }
+      }
+    }
+  }
 
 }
 /************************************************************/
