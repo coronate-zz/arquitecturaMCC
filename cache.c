@@ -258,7 +258,7 @@ void imprimirCacheCompleto(cache *c)
 {
   printf("\n-----------------------------------------------------" );
   printf("\n\tImprimeindo Cache Completo:");
-  Pcache_line item =malloc(sizeof(cache_line));  
+  Pcache_line item;// =malloc(sizeof(cache_line));  
 
 
   for( int cont=0; cont <= c1.n_sets; cont ++   )
@@ -276,7 +276,7 @@ void imprimirCacheCompleto(cache *c)
 
 
 
-      for(int i=1; i<=c->associativity; i++)
+      for(int i=0; i<=c->associativity; i++)
       {
         if(item->dirty==1)
         {
@@ -461,241 +461,167 @@ void perform_access(addr, access_type)
   addrTag=   (c1.tag_mask&addr)>>c1.tag_mask_offset;
   addrIndex= (c1.index_mask&addr)>>c1.index_mask_offset;
   Pcache_line item;
-  item = malloc(sizeof(cache_line));
+  //item = malloc(sizeof(cache_line));
 
   //Imprimiendo las direcciones
   printf("\n\n---------------Realizando acceso a  Cache------------\n" );
   imprimirDirecciones(addr);
    
-  switch(access_type){
-        case TRACE_INST_LOAD:
-        printf("\n\nEjecutando Lectura Instruccion" );
-            cache_stat_inst.accesses++;
-            if(c1.LRU_head[addrIndex]==NULL)
-            {  // Compulsory miss
-                cache_stat_inst.misses++;
-                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                
-                item->tag=addrTag;
-                c1.LRU_head[addrIndex]=item;
-                c1.LRU_tail[addrIndex]=item;
+  switch(access_type) {
+    case TRACE_INST_LOAD:
+      printf("\n\nEjecutando Lectura Instruccion" );
+      cache_stat_inst.accesses++;
+      if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+        cache_stat_inst.misses++;
+        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));// Deberias validar que hay memoria!!
+      
+        item->tag=addrTag;
+        c1.LRU_head[addrIndex]=item;
+        c1.LRU_tail[addrIndex]=item;
 
-                printf("\n\tPrimer dato ingresado");
-                c1.LRU_head[addrIndex]->dirty=0;
-                cache_stat_inst.demand_fetches+=4;
-                c1.set_contents[addrIndex]++;
-            }
-            else // Hay infromacion, queremos ver si el dato se encuentra en cache
-            {
-                Pcache_line compare= malloc(sizeof(cache_line));  
-                compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
-                bool flagEncontrado=FALSE;
-                bool flagNext=TRUE ;
-                int cont=1;
-                while( cont<=c1.associativity && flagNext && !flagEncontrado)
-                {
-                    if(compare->tag==addrTag) //encontramos en cache la isntruccion
-                    {
-                        flagEncontrado=TRUE;
-                    }
-                    else //no encontramos el tag en una de las paginas
-                    { 
-                        if(compare->LRU_next==NULL)
-                        {
-                          printf("\n\t\t**No hay next" );
-                          flagNext=FALSE;
-                          break;
+        printf("\n\tPrimer dato ingresado");
+        c1.LRU_head[addrIndex]->dirty=0;
+        cache_stat_inst.demand_fetches+=4;
+        c1.set_contents[addrIndex]++;
+      }
+      else {  // Hay infromacion, queremos ver si el dato se encuentra en cache
+        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        bool flagEncontrado=FALSE;
+        bool flagNext=TRUE ;
+        int cont=1;
+        while( cont<=c1.associativity && flagNext && !flagEncontrado){
+          if(compare->tag==addrTag){  //encontramos en cache la isntruccion
+              flagEncontrado=TRUE;
+          } else if(compare->LRU_next==NULL){
+            printf("\n\t\t**No hay next" );
+            flagNext=FALSE;
+          } else {
+            printf("\n\t\t**Buscando en next");
+            cont ++;
+            compare= compare->LRU_next;
+          }
+        }
+        if(flagEncontrado) { //el dato esta en memoria
+          //HIT 
+          printf("\n\t :: El dato ESTA en memoria :: \n" );
+          delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
+          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
+        } else if(c1.set_contents[addrIndex] < c1.associativity) { //Aun hay espacio
+          printf("\n\t:: El dato NO esta en memoria :: \n" );
+          item->tag=addrTag;
+          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+          c1.set_contents[addrIndex]++;
+        } else { //Es necesario Borrar
+          printf("\n\t:: El dato NO esta en memoria :: \n" );
+          printf("\n\t\t***Borrando Datos..." );
+          item->tag=addrTag;
+          insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
+        }
+      }
+      //imprimirCacheCompleto(&c1);
+      break;
 
-                        }
-                        else
-                        {
-                          printf("\n\t\t**Buscando en next");
-                          cont ++;
-                          compare= compare->LRU_next;
-                          
-                        }
-                    }
-                }
-                if(flagEncontrado) //el dato esta en memoria
-                {
-                  //HIT 
-                    printf("\n\t :: El dato ESTA en memoria :: \n" );
-                    delete(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
-                    insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], compare);
-                }
-                else
-                {
-                    printf("\n\t:: El dato NO esta en memoria :: \n" );
+    case TRACE_DATA_LOAD:
+      printf("\n\nEjecutando Data Load" );
+      cache_stat_data.accesses++;
+      cache_stat_inst.accesses++;
+      if(c1.LRU_head[addrIndex]==NULL){  // Compulsory miss
+        cache_stat_inst.misses++;
+        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+        
+        item->tag=addrTag;
+        c1.LRU_head[addrIndex]=item;
+        c1.LRU_tail[addrIndex]=item;
 
-                    if(c1.set_contents[addrIndex] < c1.associativity)//Aun hay espacio
-                    {
+        printf("\n\tPrimer dato ingresado");
+        c1.LRU_head[addrIndex]->dirty=0;
+        cache_stat_inst.demand_fetches+=4;
+        c1.set_contents[addrIndex]++;
+      } else { // Hay infromacion, queremos ver si el dato se encuentra en cache
+        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        bool flagEncontrado=FALSE;
+        bool flagNext=TRUE ;
+        int cont=1;
+        while( cont<=c1.associativity && flagNext && !flagEncontrado) {
+          //printf("\nTAG: %d",compare->tag );
+          //printf("\nAddress: %d\n", addrTag );
+          if(compare->tag==addrTag) { //encontramos en cache la isntruccion
+            flagEncontrado=TRUE;
+          } else if(compare->LRU_next==NULL) {
+            printf("\n\t\t**No hay next" );
+            flagNext=FALSE;
+          } else {
+            printf("\n\t\t**Buscando en next");
+            cont ++;
+            compare= compare->LRU_next;
+          }
+        }
+      
+        if(flagEncontrado) {
+          //HIT 
+          printf("\n\t :: El dato ESTA en memoria :: \n" );
+          dataLoadHit(compare, addrIndex);
+        } else {
+          printf("\n\t:: El dato NO esta en memoria :: \n" );
+          dataLoadMiss(addrIndex, addrTag, item);
+        }
+      }
+      break;
+      
+    case TRACE_DATA_STORE:
+      cache_stat_data.accesses++;
+      printf("\n\nEjecutando Data Store" );
+      if(c1.LRU_head[addrIndex]==NULL) {  // Compulsory miss
+        cache_stat_inst.misses++;
+        c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
+        
+        item->tag=addrTag;
+        c1.LRU_head[addrIndex]=item;
+        c1.LRU_tail[addrIndex]=item;
 
-                        item->tag=addrTag;
-                        insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
-                        c1.set_contents[addrIndex]++;
+        printf("\n\tPrimer dato ingresado");
+        c1.LRU_head[addrIndex]->dirty=0;
+        cache_stat_inst.demand_fetches+=4;
+        c1.set_contents[addrIndex]++;
+      } else { //Hay informacion
+        Pcache_line compare;//= malloc(sizeof(cache_line));  
+        compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
+        bool flagEncontrado=FALSE;
+        bool flagNext=TRUE ;
+        int cont=1;
+        while( cont<=c1.associativity && flagNext && !flagEncontrado) {
+          //printf("\nTAG: %d",compare->tag );
+          //printf("\nAddress: %d\n", addrTag );
+          if(compare->tag==addrTag) {
+            flagEncontrado=TRUE;
+          } else if(compare->LRU_next==NULL) {
+            printf("\n\t\t**No hay next" );
+            flagNext=FALSE;
+          } else {
+            printf("\n\t\t**Buscando en next");
+            cont ++;
+            compare= compare->LRU_next;       
+          }
+        }
+        if(flagEncontrado) {
+          //HIT 
+          printf("\n\t :: El dato ESTA en memoria :: \n" );
+          dataStoreHit(compare, addrIndex);
 
-                    }
-                    else //Es necesario Borrar
-                    {
-                        printf("\n\t\t***Borrando Datos..." );
-                        item->tag=addrTag;
-                        insert(&c1.LRU_head[addrIndex], &c1.LRU_tail[addrIndex], item);
-                    }
-                }
+          //Que estadisticas aumentan cuando encontramos datos?
+        } else {
+          printf("\n\t:: El dato NO esta en memoria :: \n" );
+          dataStoreMiss(addrIndex, addrTag, item);
+        }
+      }
+      break;
 
+  }
 
-            }
-            //imprimirCacheCompleto(&c1);
-
-            break;
-
-        case TRACE_DATA_LOAD:
-
-            cache_stat_data.accesses++;
-            printf("\n\nEjecutando Data Load" );
-                       cache_stat_inst.accesses++;
-            if(c1.LRU_head[addrIndex]==NULL)
-            {  // Compulsory miss
-                cache_stat_inst.misses++;
-                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                
-                item->tag=addrTag;
-                c1.LRU_head[addrIndex]=item;
-                c1.LRU_tail[addrIndex]=item;
-
-                printf("\n\tPrimer dato ingresado");
-                c1.LRU_head[addrIndex]->dirty=0;
-                cache_stat_inst.demand_fetches+=4;
-                c1.set_contents[addrIndex]++;
-            }
-            else // Hay infromacion, queremos ver si el dato se encuentra en cache
-            {
-                Pcache_line compare= malloc(sizeof(cache_line));  
-                compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
-                bool flagEncontrado=FALSE;
-                bool flagNext=TRUE ;
-                int cont=1;
-                while( cont<=c1.associativity && flagNext && !flagEncontrado)
-                {
-                  //printf("\nTAG: %d",compare->tag );
-                  //printf("\nAddress: %d\n", addrTag );
-                    if(compare->tag==addrTag) //encontramos en cache la isntruccion
-                    {
-                        flagEncontrado=TRUE;
-                    }
-                    else //no encontramos el tag en una de las paginas
-                    { 
-                        if(compare->LRU_next==NULL)
-                        {
-                          printf("\n\t\t**No hay next" );
-                          flagNext=FALSE;
-                          break;
-
-                        }
-                        else
-                        {
-                          printf("\n\t\t**Buscando en next");
-                          cont ++;
-                          compare= compare->LRU_next;
-                          
-                        }
-                    }
-                }
-                if(flagEncontrado) //el dato esta en memoria
-                {
-                  //HIT 
-                    printf("\n\t :: El dato ESTA en memoria :: \n" );
-                    dataLoadHit(compare, addrIndex);
-                }
-                else
-                {
-                    printf("\n\t:: El dato NO esta en memoria :: \n" );
-                    dataLoadMiss(addrIndex, addrTag, item);
-                }
-
-
-
-            }
-
-
-
-
-            break;
-        case TRACE_DATA_STORE:
-            cache_stat_data.accesses++;
-            printf("\n\nEjecutando Data Store" );
-                       cache_stat_inst.accesses++;
-            if(c1.LRU_head[addrIndex]==NULL)
-            {  // Compulsory miss
-                cache_stat_inst.misses++;
-                c1.LRU_head[addrIndex]=malloc(sizeof(cache_line));  // Deberias validar que hay memoria!!
-                
-                item->tag=addrTag;
-                c1.LRU_head[addrIndex]=item;
-                c1.LRU_tail[addrIndex]=item;
-
-                printf("\n\tPrimer dato ingresado");
-                c1.LRU_head[addrIndex]->dirty=0;
-                cache_stat_inst.demand_fetches+=4;
-                c1.set_contents[addrIndex]++;
-            }
-            else // Hay infromacion, queremos ver si el dato se encuentra en cache
-            {
-                Pcache_line compare= malloc(sizeof(cache_line));  
-                compare= c1.LRU_head[addrIndex]; //apuntador a cache_line
-                bool flagEncontrado=FALSE;
-                bool flagNext=TRUE ;
-                int cont=1;
-                while( cont<=c1.associativity && flagNext && !flagEncontrado)
-                {
-                  //printf("\nTAG: %d",compare->tag );
-                  //printf("\nAddress: %d\n", addrTag );
-                    if(compare->tag==addrTag) //encontramos en cache la isntruccion
-                    {
-                        flagEncontrado=TRUE;
-                    }
-                    else //no encontramos el tag en una de las paginas
-                    { 
-                        if(compare->LRU_next==NULL)
-                        {
-                          printf("\n\t\t**No hay next" );
-                          flagNext=FALSE;
-                          break;
-
-                        }
-                        else
-                        {
-                          printf("\n\t\t**Buscando en next");
-                          cont ++;
-                          compare= compare->LRU_next;
-                          
-                        }
-                    }
-                }
-                if(flagEncontrado) //el dato esta en memoria
-                {
-                  //HIT 
-                    printf("\n\t :: El dato ESTA en memoria :: \n" );
-                    dataStoreHit(compare, addrIndex);
-
-                    //Que estadisticas aumentan cuando encontramos datos?
-                }
-                else
-                {
-                    printf("\n\t:: El dato NO esta en memoria :: \n" );
-                    dataStoreMiss(addrIndex, addrTag, item);
-                }
-
-
-            }
-
-            break;
-    }
-
-
-  imprimirCacheCompleto(&c1);
+  //imprimirCacheCompleto(&c1);
   printf("\n\n\n");
-
   /* handle an access to the cache */
 
 }
