@@ -1,6 +1,7 @@
 default:
 	gcc	-g 	main.c 	cache.c -lm
-	./a.out -us 8192 -bs 16 -a 3 -wa -wb trazas/spicex.trace
+	#./a.out -us 8192 -bs 16 -a 1 -wa -wb trazas/spice.trace
+	./a.out -ds 8192 -is 8192 -bs 64 -a 2 -wa -wt trazas/spice.trace
 	
 	#gdb a.out
 
