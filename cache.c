@@ -662,7 +662,7 @@ void flush()
     if(c1.LRU_head[i]!=NULL){
       for(current = c1.LRU_head[i]; current!=NULL; current=current->LRU_next){
         if(current->dirty){
-          printf("\n DIRTy");
+          //printf("\n DIRTy");
           cache_stat_data.copies_back+=words_per_block;
         }
       }
@@ -673,7 +673,7 @@ void flush()
     if(c2.LRU_head[i]!=NULL){
       for(current = c2.LRU_head[i]; current!=NULL; current=current->LRU_next){
         if(current->dirty){
-          printf("\n DIRTy");
+          //printf("\n DIRTy");
           cache_stat_inst.copies_back+=words_per_block;
         }
       }
