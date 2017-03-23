@@ -4,7 +4,7 @@
 i:	.word32 0
 j:	.word32 0
 .text
-	daddi R2,R0,0;
+	daddi R2,R0, 8;
 	daddi r3, R0, 0;
 	daddi r5,R0,10 ;
 WHIL:	slt R6, R2, R5
@@ -15,4 +15,10 @@ WHIL:	slt R6, R2, R5
 	sw	r2,i(r0)
 	j WHIL
 ENDW:	nop
+	daddi R2,R0, 8;
+	daddi R1,R0, 8;
+	daddi R4,R0, 8;
+
+
+
 	halt
