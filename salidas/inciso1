@@ -1,0 +1,873 @@
+gcc	-g 	main.c 	cache.c -lm
+#./a.out -us 8192 -bs 16 -a 1 -wa -wb trazas/spice.trace
+./a.out -ds 128 -is 128 -bs 4 -a 32 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	128
+  D-cache size: 	128
+  Associativity: 	32
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         128
+	**Associativity : 32
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         128
+	**Associativity : 32
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    494190
+  miss rate: 0.6313 (hit rate 0.3687)
+  replace:   494158
+ DATA
+  accesses:  217237
+  misses:    100030
+  miss rate: 0.4605 (hit rate 0.5395)
+  replace:   99998
+ TRAFFIC (in words)
+  demand fetch:  594220
+  copies back:   41819
+./a.out -ds 256 -is 256 -bs 4 -a 64 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	256
+  D-cache size: 	256
+  Associativity: 	64
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         256
+	**Associativity : 64
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         256
+	**Associativity : 64
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    426746
+  miss rate: 0.5452 (hit rate 0.4548)
+  replace:   426682
+ DATA
+  accesses:  217237
+  misses:    59898
+  miss rate: 0.2757 (hit rate 0.7243)
+  replace:   59834
+ TRAFFIC (in words)
+  demand fetch:  486644
+  copies back:   27201
+./a.out -ds 512 -is 512 -bs 4 -a 128 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	512
+  D-cache size: 	512
+  Associativity: 	128
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         512
+	**Associativity : 128
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         512
+	**Associativity : 128
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    362575
+  miss rate: 0.4632 (hit rate 0.5368)
+  replace:   362447
+ DATA
+  accesses:  217237
+  misses:    33711
+  miss rate: 0.1552 (hit rate 0.8448)
+  replace:   33583
+ TRAFFIC (in words)
+  demand fetch:  396286
+  copies back:   17750
+./a.out -ds 1024 -is 1024 -bs 4 -a 256 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	1024
+  D-cache size: 	1024
+  Associativity: 	256
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         1024
+	**Associativity : 256
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         1024
+	**Associativity : 256
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    191922
+  miss rate: 0.2452 (hit rate 0.7548)
+  replace:   191666
+ DATA
+  accesses:  217237
+  misses:    19993
+  miss rate: 0.0920 (hit rate 0.9080)
+  replace:   19737
+ TRAFFIC (in words)
+  demand fetch:  211915
+  copies back:   9784
+./a.out -ds 2048 -is 2048 -bs 4 -a 512 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	2048
+  D-cache size: 	2048
+  Associativity: 	512
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         2048
+	**Associativity : 512
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         2048
+	**Associativity : 512
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    107987
+  miss rate: 0.1380 (hit rate 0.8620)
+  replace:   107475
+ DATA
+  accesses:  217237
+  misses:    10170
+  miss rate: 0.0468 (hit rate 0.9532)
+  replace:   9658
+ TRAFFIC (in words)
+  demand fetch:  118157
+  copies back:   5703
+./a.out -ds 4096 -is 4096 -bs 4 -a 1024 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	4096
+  D-cache size: 	4096
+  Associativity: 	1024
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         4096
+	**Associativity : 1024
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         4096
+	**Associativity : 1024
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    73811
+  miss rate: 0.0943 (hit rate 0.9057)
+  replace:   72787
+ DATA
+  accesses:  217237
+  misses:    7475
+  miss rate: 0.0344 (hit rate 0.9656)
+  replace:   6451
+ TRAFFIC (in words)
+  demand fetch:  81286
+  copies back:   4708
+./a.out -ds 8192 -is 8192 -bs 4 -a 2048 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	8192
+  D-cache size: 	8192
+  Associativity: 	2048
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         8192
+	**Associativity : 2048
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         8192
+	**Associativity : 2048
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    19782
+  miss rate: 0.0253 (hit rate 0.9747)
+  replace:   17734
+ DATA
+  accesses:  217237
+  misses:    5950
+  miss rate: 0.0274 (hit rate 0.9726)
+  replace:   3902
+ TRAFFIC (in words)
+  demand fetch:  25732
+  copies back:   3977
+./a.out -ds 16384 -is 16384 -bs 4 -a 4096 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	16384
+  D-cache size: 	16384
+  Associativity: 	4096
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         16384
+	**Associativity : 4096
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         16384
+	**Associativity : 4096
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    10620
+  miss rate: 0.0136 (hit rate 0.9864)
+  replace:   6524
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   129
+ TRAFFIC (in words)
+  demand fetch:  14845
+  copies back:   3029
+./a.out -ds 32768 -is 32768 -bs 4 -a 8192 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	32768
+  D-cache size: 	32768
+  Associativity: 	8192
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         32768
+	**Associativity : 8192
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         32768
+	**Associativity : 8192
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   772
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 65536 -is 65536 -bs 4 -a 16384 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	65536
+  D-cache size: 	65536
+  Associativity: 	16384
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         65536
+	**Associativity : 16384
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         65536
+	**Associativity : 16384
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 131072 -is 131072 -bs 4 -a 32768 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	131072
+  D-cache size: 	131072
+  Associativity: 	32768
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         131072
+	**Associativity : 32768
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         131072
+	**Associativity : 32768
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 262144 -is 262144 -bs 4 -a 65536 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	262144
+  D-cache size: 	262144
+  Associativity: 	65536
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         262144
+	**Associativity : 65536
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         262144
+	**Associativity : 65536
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 524288 -is 524288 -bs 4 -a 131072 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	524288
+  D-cache size: 	524288
+  Associativity: 	131072
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         524288
+	**Associativity : 131072
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         524288
+	**Associativity : 131072
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 1048576 -is 1048576 -bs 4 -a 262144 -wa -wb trazas/spice.trace
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	1048576
+  D-cache size: 	1048576
+  Associativity: 	262144
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         1048576
+	**Associativity : 262144
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         1048576
+	**Associativity : 262144
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+./a.out -ds 2097152 -is 2097152 -bs 4 -a 524288 -wa -wb trazas/spice.trace	
+
+
+*** CACHE SETTINGS ***
+  Split I- D-cache
+  I-cache size: 	2097152
+  D-cache size: 	2097152
+  Associativity: 	524288
+  Block size: 	4
+  Write policy: 	WRITE BACK
+  Allocation policy: 	WRITE ALLOCATE
+
+Inicializando Cache...
+
+
+
+*** Datos en Cache ***
+	**Size:         2097152
+	**Associativity : 524288
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011
+
+*** Datos en Cache ***
+	**Size:         2097152
+	**Associativity : 524288
+	**Num Sets :      1
+	**Contents: 0
+Tag Mask : -4      || 11111111111111111111111111111100
+Index Mask :  0  || 00000000000000000000000000000000
+Offset Mask : 3      || 00000000000000000000000000000011processed 100000 references
+processed 200000 references
+processed 300000 references
+processed 400000 references
+processed 500000 references
+processed 600000 references
+processed 700000 references
+processed 800000 references
+processed 900000 references
+processed 1000000 references
+
+ Starts flushing
+*** CACHE STATISTICS ***
+ INSTRUCTIONS
+  accesses:  782764
+  misses:    8964
+  miss rate: 0.0115 (hit rate 0.9885)
+  replace:   0
+ DATA
+  accesses:  217237
+  misses:    4225
+  miss rate: 0.0194 (hit rate 0.9806)
+  replace:   0
+ TRAFFIC (in words)
+  demand fetch:  13189
+  copies back:   3029
+#gdb a.out
