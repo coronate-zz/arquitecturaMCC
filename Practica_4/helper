@@ -1,0 +1,8 @@
+scp intro.cu maestria@148.205.36.162:~/Desktop/AlejandrosTania
+
+
+
+nvcc -o a.out intro.cu
+./a.out
+
+ssh maestria@148.205.36.162
