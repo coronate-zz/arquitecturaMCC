@@ -33,13 +33,13 @@ __global__ void mandel_numpoints(int *d_np){
   c.real = -2.0+2.5*(double)(i)/(double)(NPOINTS)+1.0e-7;
   c.imag = 1.125*(double)(j)/(double)(NPOINTS)+1.0e-7;
   z=c;
-  d_np[idx + NPOINTS*idy] = 0;
+  d_np[i + NPOINTS*j] = 0;
   for (iter=0; iter<MAXITER; iter++){
     ztemp=(z.real*z.real)-(z.imag*z.imag)+c.real;
     z.imag=z.real*z.imag*2+c.imag; 
     z.real=ztemp; 
     if ((z.real*z.real+z.imag*z.imag)>4.0e0) {
-      d_np[idx + NPOINTS*idy] = 1;
+      d_np[i + NPOINTS*j] = 1;
       break;
     }
   }
