@@ -1,8 +1,10 @@
-scp intro.cu maestria@148.205.36.162:~/Desktop/AlejandrosTania
+scp ejercicio3.cu maestria@148.205.36.162:~/Desktop/AlejandrosTania
 
 
 
 nvcc -o a.out intro.cu
+nvcc -arch compute_20 ejercicio3.cu   -o alejandro.out
+
 ./a.out
 
 ssh maestria@148.205.36.162

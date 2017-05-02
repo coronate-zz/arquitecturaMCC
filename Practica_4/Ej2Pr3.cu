@@ -19,9 +19,11 @@ __global__ void square_array(float *a, int N)
 {
 	int n_elem_per_thread = N / (gridDim.x * blockDim.x);
 	int block_start_idx = n_elem_per_thread * blockIdx.x * blockDim.x;
+
 	int thread_start_idx = block_start_idx
-	+ (threadIdx.x / STRIDE) * n_elem_per_thread * STRIDE
-	+ ((threadIdx.x + OFFSET) % STRIDE);
+							+ (threadIdx.x / STRIDE) * n_elem_per_thread * STRIDE
+							+ ((threadIdx.x + OFFSET) % STRIDE);
+
 	int thread_end_idx = thread_start_idx + n_elem_per_thread * STRIDE;
 	if(thread_end_idx > N) thread_end_idx = N;
 	int group = (threadIdx.x / GROUP_SIZE) & 1;
@@ -29,7 +31,9 @@ __global__ void square_array(float *a, int N)
 	{
 		if(!group) a[idx] = a[idx] * a[idx];
 		else       a[idx] = a[idx] + a[idx];
+
 	}
+
 }
 
 // main routine that executes on the host

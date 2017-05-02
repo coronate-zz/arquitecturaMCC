@@ -10,10 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
-
-
 /* Kernel para sumar dos vectores en un sólo bloque de hilos */
 __global__ void vect_add(int *d_a, int *d_b, int *d_c)
 {
@@ -57,7 +53,7 @@ __global__ void vect_add_multiblock(int *d_a, int *d_b, int *d_c)
  * Número de bloques e hilos
  * Su producto siempre debe ser el tamaño del vector (arreglo).
  */
-#define NUM_BLOCKS  1
+#define NUM_BLOCKS  6
 #define THREADS_PER_BLOCK 256
 
 /* Main routine */
@@ -103,15 +99,11 @@ int main(int argc, char *argv[])
     cudaMemcpy(d_c, h_c, sz, cudaMemcpyHostToDevice);
 
 
-
-
     /* run the kernel on the GPU */
     /* Parte 2A: Configurar y llamar los kernels */
     /* dim3 dimGrid( ); */
     /* dim3 dimBlock( ); */
     vect_add<<< 1, ARRAY_SIZE >>>(d_a, d_b, d_c ); 
-
-
 
 
     /* Esperar a que todos los threads acaben y checar por errores */
@@ -131,7 +123,6 @@ int main(int argc, char *argv[])
     printf("\n\n");
 
 
-    int NUM_BLOCKS = 6;
 
     /* Ejecutando ejrcicios 2B */
 
