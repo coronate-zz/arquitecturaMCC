@@ -27,20 +27,28 @@ __global__ void square_array(float *a, int N)
 	int thread_end_idx = thread_start_idx + n_elem_per_thread * STRIDE;
 	if(thread_end_idx > N) thread_end_idx = N;
 	int group = (threadIdx.x / GROUP_SIZE) & 1;
+	// printf("%d",group);
 	for(int idx=thread_start_idx; idx < thread_end_idx; idx+=STRIDE)
 	{
 		if(!group) a[idx] = a[idx] * a[idx];
 		else       a[idx] = a[idx] + a[idx];
+<<<<<<< HEAD
 
 	}
 
+=======
+		//printf("idx: %d a: %d \n", idx, a[idx]);
+	}
+	//printf("start: %d end: %d STRIDE: %d OFFSET: %d GS: %d \n",
+	//	thread_start_idx, thread_end_idx, STRIDE, OFFSET, GROUP_SIZE);
+>>>>>>> 3bbd12b90c03095c7e4f6b401835b31e278d3066
 }
 
 // main routine that executes on the host
 int main(void)
 {
 	float *a_h, *a_d;  // Pointer to host & device arrays
-	const int N = 1<<10;  // Make a big array with 2**N elements
+	const int N = 1<<22;  // Make a big array with 2**10 elements
 	size_t size = N * sizeof(float);
     
     /* Auxiliares para medir tiempos */
@@ -53,6 +61,8 @@ int main(void)
     // Initialize host array and copy it to CUDA device
 	for (int i=0; i<N; i++)
         a_h[i] = (float)i;
+
+    //for (int i=0; i<N; i+=N/50) printf("%d %f\n", i, a_h[i]);
 
 	cudaMemcpy(a_d, a_h, size, cudaMemcpyHostToDevice);
     checkCUDAError("memcpy");
